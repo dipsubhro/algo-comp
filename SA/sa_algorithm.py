@@ -1,6 +1,6 @@
 import numpy as np
 from typing import Callable, Dict, Any, Tuple, List
-BASE_SEED = 84748
+BASE_SEED = 954777839
 
 class SAConfig:
 

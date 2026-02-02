@@ -1,7 +1,7 @@
 import numpy as np
 import random
 from typing import Callable, Dict, Any, Tuple, List
-BASE_SEED = 12345
+BASE_SEED = 954777839
 
 class PSOConfig:
 

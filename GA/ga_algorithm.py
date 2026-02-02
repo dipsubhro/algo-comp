@@ -2,7 +2,7 @@ import numpy as np
 import random
 import time
 from multiprocessing import Pool, cpu_count
-BASE_SEED = 54321
+BASE_SEED = 954777839
 DEFAULT_CONFIG = {'pop_size': 50, 'num_generations': 1000, 'crossover_rate': 0.9, 'mutation_rate': 0.15, 'elite_size': 3}
 
 def initialize_population(bounds, n_dimensions, pop_size):
