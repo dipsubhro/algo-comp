@@ -37,10 +37,16 @@ sys.path.insert(0, str(ROOT / "TA"))
 sys.path.insert(0, str(ROOT / "GA"))
 
 # Import benchmark functions from global func.py
+# 10 Unimodal functions
 from func import (
-    sphere, sum_of_squares, sum_of_different_powers, step, brown,
-    zakharov, dixon_price, schumer_steiglitz, csendes, sixth_power,
-    powell, quartic, rotated_hyper_ellipsoid, discus, exponential
+    sphere, sum_of_squares, sum_of_different_powers, step,
+    zakharov, dixon_price, schumer_steiglitz, sixth_power,
+    quartic, rotated_hyper_ellipsoid
+)
+# 10 Multimodal functions
+from func import (
+    rastrigin, ackley, griewank, schwefel, levy,
+    styblinski_tang, alpine, schaffer_f6, rosenbrock, drop_wave
 )
 
 # Import algorithms
@@ -93,21 +99,28 @@ GA_CONFIG = {
 
 # GA configurations per function
 GA_CONFIGS = {
+    # Unimodal functions
     "Sphere": {'pop_size': 50, 'num_generations': 1000, 'crossover_rate': 0.9, 'mutation_rate': 0.15, 'elite_size': 3},
     "Sum_of_Squares": {'pop_size': 50, 'num_generations': 1000, 'crossover_rate': 0.9, 'mutation_rate': 0.15, 'elite_size': 3},
     "Sum_of_Diff_Powers": {'pop_size': 40, 'num_generations': 800, 'crossover_rate': 0.9, 'mutation_rate': 0.1, 'elite_size': 3},
     "Step": {'pop_size': 60, 'num_generations': 1200, 'crossover_rate': 0.9, 'mutation_rate': 0.2, 'elite_size': 5},
-    "Brown": {'pop_size': 50, 'num_generations': 1000, 'crossover_rate': 0.9, 'mutation_rate': 0.15, 'elite_size': 3},
     "Zakharov": {'pop_size': 50, 'num_generations': 1000, 'crossover_rate': 0.9, 'mutation_rate': 0.15, 'elite_size': 3},
     "Dixon_Price": {'pop_size': 55, 'num_generations': 1200, 'crossover_rate': 0.9, 'mutation_rate': 0.15, 'elite_size': 4},
     "Schumer_Steiglitz": {'pop_size': 50, 'num_generations': 1000, 'crossover_rate': 0.9, 'mutation_rate': 0.15, 'elite_size': 3},
-    "Csendes": {'pop_size': 40, 'num_generations': 800, 'crossover_rate': 0.9, 'mutation_rate': 0.1, 'elite_size': 3},
     "Sixth_Power": {'pop_size': 40, 'num_generations': 800, 'crossover_rate': 0.9, 'mutation_rate': 0.1, 'elite_size': 3},
-    "Powell": {'pop_size': 60, 'num_generations': 1500, 'crossover_rate': 0.9, 'mutation_rate': 0.2, 'elite_size': 5},
     "Quartic": {'pop_size': 40, 'num_generations': 800, 'crossover_rate': 0.9, 'mutation_rate': 0.1, 'elite_size': 3},
     "Rotated_Hyper_Ellipsoid": {'pop_size': 60, 'num_generations': 1500, 'crossover_rate': 0.9, 'mutation_rate': 0.2, 'elite_size': 5},
-    "Discus": {'pop_size': 60, 'num_generations': 1500, 'crossover_rate': 0.9, 'mutation_rate': 0.2, 'elite_size': 5},
-    "Exponential": {'pop_size': 40, 'num_generations': 800, 'crossover_rate': 0.9, 'mutation_rate': 0.1, 'elite_size': 3},
+    # Multimodal functions
+    "Rastrigin": {'pop_size': 80, 'num_generations': 1500, 'crossover_rate': 0.9, 'mutation_rate': 0.2, 'elite_size': 5},
+    "Ackley": {'pop_size': 70, 'num_generations': 1200, 'crossover_rate': 0.9, 'mutation_rate': 0.18, 'elite_size': 4},
+    "Griewank": {'pop_size': 60, 'num_generations': 1000, 'crossover_rate': 0.9, 'mutation_rate': 0.15, 'elite_size': 4},
+    "Schwefel": {'pop_size': 100, 'num_generations': 2000, 'crossover_rate': 0.85, 'mutation_rate': 0.25, 'elite_size': 5},
+    "Levy": {'pop_size': 60, 'num_generations': 1200, 'crossover_rate': 0.9, 'mutation_rate': 0.15, 'elite_size': 4},
+    "Styblinski_Tang": {'pop_size': 50, 'num_generations': 1000, 'crossover_rate': 0.9, 'mutation_rate': 0.15, 'elite_size': 3},
+    "Alpine": {'pop_size': 60, 'num_generations': 1200, 'crossover_rate': 0.9, 'mutation_rate': 0.18, 'elite_size': 4},
+    "Schaffer_F6": {'pop_size': 70, 'num_generations': 1500, 'crossover_rate': 0.9, 'mutation_rate': 0.2, 'elite_size': 5},
+    "Rosenbrock": {'pop_size': 80, 'num_generations': 2000, 'crossover_rate': 0.9, 'mutation_rate': 0.15, 'elite_size': 5},
+    "Drop_Wave": {'pop_size': 60, 'num_generations': 1200, 'crossover_rate': 0.9, 'mutation_rate': 0.18, 'elite_size': 4},
 }
 
 # ==============================================================================
@@ -116,78 +129,107 @@ GA_CONFIGS = {
 
 # PSO configurations per function (n_particles, max_iterations)
 PSO_CONFIGS = {
+    # Unimodal functions
     "Sphere": {'n_particles': 40, 'max_iterations': 1000},
     "Sum_of_Squares": {'n_particles': 40, 'max_iterations': 1000},
     "Sum_of_Diff_Powers": {'n_particles': 30, 'max_iterations': 800},
     "Step": {'n_particles': 50, 'max_iterations': 1200},
-    "Brown": {'n_particles': 35, 'max_iterations': 1000},
     "Zakharov": {'n_particles': 40, 'max_iterations': 1000},
     "Dixon_Price": {'n_particles': 45, 'max_iterations': 1200},
     "Schumer_Steiglitz": {'n_particles': 40, 'max_iterations': 1000},
-    "Csendes": {'n_particles': 30, 'max_iterations': 800},
     "Sixth_Power": {'n_particles': 30, 'max_iterations': 800},
-    "Powell": {'n_particles': 50, 'max_iterations': 1500},
     "Quartic": {'n_particles': 30, 'max_iterations': 800},
     "Rotated_Hyper_Ellipsoid": {'n_particles': 50, 'max_iterations': 1500},
-    "Discus": {'n_particles': 50, 'max_iterations': 1500},
-    "Exponential": {'n_particles': 30, 'max_iterations': 800},
+    # Multimodal functions
+    "Rastrigin": {'n_particles': 60, 'max_iterations': 1500},
+    "Ackley": {'n_particles': 50, 'max_iterations': 1200},
+    "Griewank": {'n_particles': 45, 'max_iterations': 1000},
+    "Schwefel": {'n_particles': 80, 'max_iterations': 2000},
+    "Levy": {'n_particles': 45, 'max_iterations': 1200},
+    "Styblinski_Tang": {'n_particles': 40, 'max_iterations': 1000},
+    "Alpine": {'n_particles': 50, 'max_iterations': 1200},
+    "Schaffer_F6": {'n_particles': 60, 'max_iterations': 1500},
+    "Rosenbrock": {'n_particles': 60, 'max_iterations': 1500},
+    "Drop_Wave": {'n_particles': 50, 'max_iterations': 1200},
 }
 
 # SA configurations per function (max_iterations, initial_temp, step_size)
 SA_CONFIGS = {
+    # Unimodal functions
     "Sphere": {'max_iterations': 1500, 'initial_temp': 1000.0, 'step_size': 0.5},
     "Sum_of_Squares": {'max_iterations': 1500, 'initial_temp': 1000.0, 'step_size': 1.0},
     "Sum_of_Diff_Powers": {'max_iterations': 1200, 'initial_temp': 500.0, 'step_size': 0.1},
     "Step": {'max_iterations': 2000, 'initial_temp': 1500.0, 'step_size': 5.0},
-    "Brown": {'max_iterations': 1500, 'initial_temp': 800.0, 'step_size': 0.3},
     "Zakharov": {'max_iterations': 1500, 'initial_temp': 1000.0, 'step_size': 0.8},
     "Dixon_Price": {'max_iterations': 1500, 'initial_temp': 1000.0, 'step_size': 1.0},
     "Schumer_Steiglitz": {'max_iterations': 1500, 'initial_temp': 1000.0, 'step_size': 1.0},
-    "Csendes": {'max_iterations': 1200, 'initial_temp': 500.0, 'step_size': 0.1},
     "Sixth_Power": {'max_iterations': 1200, 'initial_temp': 500.0, 'step_size': 0.1},
-    "Powell": {'max_iterations': 2000, 'initial_temp': 1200.0, 'step_size': 0.5},
     "Quartic": {'max_iterations': 1200, 'initial_temp': 500.0, 'step_size': 0.1},
     "Rotated_Hyper_Ellipsoid": {'max_iterations': 2000, 'initial_temp': 1500.0, 'step_size': 3.0},
-    "Discus": {'max_iterations': 2000, 'initial_temp': 1500.0, 'step_size': 5.0},
-    "Exponential": {'max_iterations': 1200, 'initial_temp': 500.0, 'step_size': 0.1},
+    # Multimodal functions
+    "Rastrigin": {'max_iterations': 2500, 'initial_temp': 2000.0, 'step_size': 0.5},
+    "Ackley": {'max_iterations': 2000, 'initial_temp': 1500.0, 'step_size': 2.0},
+    "Griewank": {'max_iterations': 1800, 'initial_temp': 1200.0, 'step_size': 5.0},
+    "Schwefel": {'max_iterations': 3000, 'initial_temp': 3000.0, 'step_size': 20.0},
+    "Levy": {'max_iterations': 2000, 'initial_temp': 1200.0, 'step_size': 1.0},
+    "Styblinski_Tang": {'max_iterations': 1500, 'initial_temp': 1000.0, 'step_size': 0.5},
+    "Alpine": {'max_iterations': 2000, 'initial_temp': 1500.0, 'step_size': 1.0},
+    "Schaffer_F6": {'max_iterations': 2500, 'initial_temp': 2000.0, 'step_size': 5.0},
+    "Rosenbrock": {'max_iterations': 3000, 'initial_temp': 2000.0, 'step_size': 1.0},
+    "Drop_Wave": {'max_iterations': 2000, 'initial_temp': 1500.0, 'step_size': 0.5},
 }
 
 # Tabu configurations per function (neighbors, tenure, max_iter)
 TABU_CONFIGS = {
+    # Unimodal functions
     "Sphere": {'neighbors': 40, 'tenure': 8, 'max_iter': 2000},
     "Sum_of_Squares": {'neighbors': 40, 'tenure': 8, 'max_iter': 2000},
     "Sum_of_Diff_Powers": {'neighbors': 30, 'tenure': 5, 'max_iter': 1500},
     "Step": {'neighbors': 50, 'tenure': 10, 'max_iter': 2500},
-    "Brown": {'neighbors': 35, 'tenure': 7, 'max_iter': 2000},
     "Zakharov": {'neighbors': 40, 'tenure': 8, 'max_iter': 2000},
     "Dixon_Price": {'neighbors': 45, 'tenure': 9, 'max_iter': 2000},
     "Schumer_Steiglitz": {'neighbors': 40, 'tenure': 8, 'max_iter': 2000},
-    "Csendes": {'neighbors': 30, 'tenure': 5, 'max_iter': 1500},
     "Sixth_Power": {'neighbors': 30, 'tenure': 5, 'max_iter': 1500},
-    "Powell": {'neighbors': 50, 'tenure': 10, 'max_iter': 2500},
     "Quartic": {'neighbors': 30, 'tenure': 5, 'max_iter': 1500},
     "Rotated_Hyper_Ellipsoid": {'neighbors': 50, 'tenure': 10, 'max_iter': 2500},
-    "Discus": {'neighbors': 50, 'tenure': 10, 'max_iter': 2500},
-    "Exponential": {'neighbors': 30, 'tenure': 5, 'max_iter': 1500},
+    # Multimodal functions
+    "Rastrigin": {'neighbors': 60, 'tenure': 12, 'max_iter': 3000},
+    "Ackley": {'neighbors': 50, 'tenure': 10, 'max_iter': 2500},
+    "Griewank": {'neighbors': 45, 'tenure': 9, 'max_iter': 2000},
+    "Schwefel": {'neighbors': 80, 'tenure': 15, 'max_iter': 4000},
+    "Levy": {'neighbors': 50, 'tenure': 10, 'max_iter': 2500},
+    "Styblinski_Tang": {'neighbors': 40, 'tenure': 8, 'max_iter': 2000},
+    "Alpine": {'neighbors': 50, 'tenure': 10, 'max_iter': 2500},
+    "Schaffer_F6": {'neighbors': 60, 'tenure': 12, 'max_iter': 3000},
+    "Rosenbrock": {'neighbors': 60, 'tenure': 12, 'max_iter': 3500},
+    "Drop_Wave": {'neighbors': 50, 'tenure': 10, 'max_iter': 2500},
 }
 
 # Benchmark functions with their bounds
+# 10 Unimodal + 10 Multimodal functions
 BENCHMARK_FUNCTIONS = [
+    # Unimodal functions (10)
     ("Sphere", sphere, (-5.12, 5.12), NUM_DIMENSIONS),
     ("Sum_of_Squares", sum_of_squares, (-10, 10), NUM_DIMENSIONS),
     ("Sum_of_Diff_Powers", sum_of_different_powers, (-1, 1), NUM_DIMENSIONS),
     ("Step", step, (-100, 100), NUM_DIMENSIONS),
-    ("Brown", brown, (-1, 4), NUM_DIMENSIONS),
     ("Zakharov", zakharov, (-5, 10), NUM_DIMENSIONS),
     ("Dixon_Price", dixon_price, (-10, 10), NUM_DIMENSIONS),
     ("Schumer_Steiglitz", schumer_steiglitz, (-10, 10), NUM_DIMENSIONS),
-    ("Csendes", csendes, (-1, 1), NUM_DIMENSIONS),
     ("Sixth_Power", sixth_power, (-1, 1), NUM_DIMENSIONS),
-    ("Powell", powell, (-4, 5), 4),  # Works best with dims divisible by 4
     ("Quartic", quartic, (-1.28, 1.28), NUM_DIMENSIONS),
     ("Rotated_Hyper_Ellipsoid", rotated_hyper_ellipsoid, (-65.536, 65.536), NUM_DIMENSIONS),
-    ("Discus", discus, (-100, 100), NUM_DIMENSIONS),
-    ("Exponential", exponential, (-1, 1), NUM_DIMENSIONS),
+    # Multimodal functions (10)
+    ("Rastrigin", rastrigin, (-5.12, 5.12), NUM_DIMENSIONS),
+    ("Ackley", ackley, (-32.768, 32.768), NUM_DIMENSIONS),
+    ("Griewank", griewank, (-600, 600), NUM_DIMENSIONS),
+    ("Schwefel", schwefel, (-500, 500), NUM_DIMENSIONS),
+    ("Levy", levy, (-10, 10), NUM_DIMENSIONS),
+    ("Styblinski_Tang", styblinski_tang, (-5, 5), NUM_DIMENSIONS),
+    ("Alpine", alpine, (-10, 10), NUM_DIMENSIONS),
+    ("Schaffer_F6", schaffer_f6, (-100, 100), NUM_DIMENSIONS),
+    ("Rosenbrock", rosenbrock, (-5, 10), NUM_DIMENSIONS),
+    ("Drop_Wave", drop_wave, (-5.12, 5.12), NUM_DIMENSIONS),
 ]
 
 # ==============================================================================
