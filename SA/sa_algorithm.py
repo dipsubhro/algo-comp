@@ -194,9 +194,7 @@ def run_sa(
         'max_f': np.max(values_array),
         'std_f': np.std(values_array),
         'best_x': best_position,
-        'all_values': final_values,
-        'avg_history': avg_history.tolist(),
-        'all_histories': all_histories
+        'convergence_history': avg_history.tolist()
     }
 
 

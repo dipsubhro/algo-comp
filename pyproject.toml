@@ -1,0 +1,13 @@
+[project]
+name = "algo-comp"
+version = "1.0.0"
+description = "Comparison of Optimization Algorithms (PSO, SA, GA, Tabu Search)"
+requires-python = ">=3.10"
+dependencies = [
+    "numpy>=1.24.0",
+    "matplotlib>=3.7.0",
+    "tabulate>=0.9.0",
+]
+
+[tool.uv]
+package = false
