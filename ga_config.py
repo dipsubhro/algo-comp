@@ -14,7 +14,7 @@ GA_CONFIGS = {
         'mutation_rate': 0.15,
         'elite_size': 3
     },
-    'Sum_of_Squares': {
+    'Csendes': {
         'pop_size': 50,
         'num_generations': 1000,
         'crossover_rate': 0.9,
@@ -35,7 +35,7 @@ GA_CONFIGS = {
         'mutation_rate': 0.2,
         'elite_size': 5
     },
-    'Zakharov': {
+    'Powell': {
         'pop_size': 50,
         'num_generations': 1000,
         'crossover_rate': 0.9,
@@ -70,7 +70,7 @@ GA_CONFIGS = {
         'mutation_rate': 0.1,
         'elite_size': 3
     },
-    'Rotated_Hyper_Ellipsoid': {
+    'Exponential': {
         'pop_size': 60,
         'num_generations': 1500,
         'crossover_rate': 0.9,

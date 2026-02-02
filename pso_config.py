@@ -8,7 +8,7 @@ PSO_CONFIGS = {
         'n_particles': 40,
         'max_iterations': 1000
     },
-    'Sum_of_Squares': {
+    'Csendes': {
         'n_particles': 40,
         'max_iterations': 1000
     },
@@ -20,7 +20,7 @@ PSO_CONFIGS = {
         'n_particles': 50,
         'max_iterations': 1200
     },
-    'Zakharov': {
+    'Powell': {
         'n_particles': 40,
         'max_iterations': 1000
     },
@@ -40,7 +40,7 @@ PSO_CONFIGS = {
         'n_particles': 30,
         'max_iterations': 800
     },
-    'Rotated_Hyper_Ellipsoid': {
+    'Exponential': {
         'n_particles': 50,
         'max_iterations': 1500
     },

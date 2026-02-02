@@ -18,7 +18,7 @@ sys.path.insert(0, str(ROOT / 'TA'))
 sys.path.insert(0, str(ROOT / 'GA'))
 sys.path.insert(0, str(ROOT))
 
-from func import sphere, sum_of_squares, sum_of_different_powers, step, zakharov, dixon_price, schumer_steiglitz, sixth_power, quartic, rotated_hyper_ellipsoid
+from func import sphere, csendes, sum_of_different_powers, step, powell, dixon_price, schumer_steiglitz, sixth_power, quartic, exponential
 from func import rastrigin, ackley, griewank, schwefel, levy, styblinski_tang, alpine, schaffer_f6, rosenbrock, drop_wave
 from pso_algorithm import run_pso
 from sa_algorithm import run_sa
@@ -41,15 +41,15 @@ from ga_config import GA_CONFIG, GA_CONFIGS
 
 BENCHMARK_FUNCTIONS = [
     ('Sphere', sphere, (-5.12, 5.12), NUM_DIMENSIONS),
-    ('Sum_of_Squares', sum_of_squares, (-10, 10), NUM_DIMENSIONS),
+    ('Csendes', csendes, (-1, 1), NUM_DIMENSIONS),
     ('Sum_of_Diff_Powers', sum_of_different_powers, (-1, 1), NUM_DIMENSIONS),
     ('Step', step, (-100, 100), NUM_DIMENSIONS),
-    ('Zakharov', zakharov, (-5, 10), NUM_DIMENSIONS),
+    ('Powell', powell, (-4, 5), NUM_DIMENSIONS),
     ('Dixon_Price', dixon_price, (-10, 10), NUM_DIMENSIONS),
     ('Schumer_Steiglitz', schumer_steiglitz, (-10, 10), NUM_DIMENSIONS),
     ('Sixth_Power', sixth_power, (-1, 1), NUM_DIMENSIONS),
     ('Quartic', quartic, (-1.28, 1.28), NUM_DIMENSIONS),
-    ('Rotated_Hyper_Ellipsoid', rotated_hyper_ellipsoid, (-65.536, 65.536), NUM_DIMENSIONS),
+    ('Exponential', exponential, (-1, 1), NUM_DIMENSIONS),
     ('Rastrigin', rastrigin, (-5.12, 5.12), NUM_DIMENSIONS),
     ('Ackley', ackley, (-32.768, 32.768), NUM_DIMENSIONS),
     ('Griewank', griewank, (-600, 600), NUM_DIMENSIONS),

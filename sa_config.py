@@ -10,7 +10,7 @@ SA_CONFIGS = {
         'initial_temp': 1000.0,
         'step_size': 0.5
     },
-    'Sum_of_Squares': {
+    'Csendes': {
         'max_iterations': 1500,
         'initial_temp': 1000.0,
         'step_size': 1.0
@@ -25,7 +25,7 @@ SA_CONFIGS = {
         'initial_temp': 1500.0,
         'step_size': 5.0
     },
-    'Zakharov': {
+    'Powell': {
         'max_iterations': 1500,
         'initial_temp': 1000.0,
         'step_size': 0.8
@@ -50,7 +50,7 @@ SA_CONFIGS = {
         'initial_temp': 500.0,
         'step_size': 0.1
     },
-    'Rotated_Hyper_Ellipsoid': {
+    'Exponential': {
         'max_iterations': 2000,
         'initial_temp': 1500.0,
         'step_size': 3.0

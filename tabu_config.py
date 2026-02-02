@@ -10,7 +10,7 @@ TABU_CONFIGS = {
         'tenure': 8,
         'max_iter': 2000
     },
-    'Sum_of_Squares': {
+    'Csendes': {
         'neighbors': 40,
         'tenure': 8,
         'max_iter': 2000
@@ -25,7 +25,7 @@ TABU_CONFIGS = {
         'tenure': 10,
         'max_iter': 2500
     },
-    'Zakharov': {
+    'Powell': {
         'neighbors': 40,
         'tenure': 8,
         'max_iter': 2000
@@ -50,7 +50,7 @@ TABU_CONFIGS = {
         'tenure': 5,
         'max_iter': 1500
     },
-    'Rotated_Hyper_Ellipsoid': {
+    'Exponential': {
         'neighbors': 50,
         'tenure': 10,
         'max_iter': 2500
