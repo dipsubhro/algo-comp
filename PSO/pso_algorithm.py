@@ -7,6 +7,12 @@ import numpy as np
 import random
 from typing import Callable, Dict, Any, Tuple, List
 
+# ==============================================================================
+# GLOBAL SEED CONFIGURATION
+# Change this value to modify the random seed for PSO algorithm
+# ==============================================================================
+BASE_SEED = 12345
+
 
 class PSOConfig:
     """Configuration for PSO algorithm parameters."""
@@ -142,7 +148,7 @@ def run_pso(
     n_particles: int = 40,
     n_dimensions: int = 5,
     max_iterations: int = 1000,
-    base_seed: int = 12345
+    base_seed: int = None
 ) -> Dict[str, Any]:
     """
     Run PSO multiple times and collect statistics.
@@ -154,11 +160,15 @@ def run_pso(
         n_particles: Number of particles in swarm
         n_dimensions: Dimensionality of the problem
         max_iterations: Maximum iterations per run
-        base_seed: Base seed for reproducibility
+        base_seed: Base seed for reproducibility (uses global BASE_SEED if None)
         
     Returns:
         Dictionary with statistics and convergence data
     """
+    # Use global BASE_SEED if not provided
+    if base_seed is None:
+        base_seed = BASE_SEED
+    
     config = PSOConfig(
         n_particles=n_particles,
         n_dimensions=n_dimensions,

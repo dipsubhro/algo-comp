@@ -6,6 +6,12 @@ Supports multiple benchmark functions with configurable parameters.
 import numpy as np
 from typing import Callable, Dict, Any, Tuple, List
 
+# ==============================================================================
+# GLOBAL SEED CONFIGURATION
+# Change this value to modify the random seed for SA algorithm
+# ==============================================================================
+BASE_SEED = 84748
+
 
 class SAConfig:
     """Configuration for Simulated Annealing algorithm parameters."""
@@ -135,7 +141,7 @@ def run_sa(
     max_iterations: int = 1500,
     initial_temp: float = 1000.0,
     step_size: float = 0.5,
-    base_seed: int = 84748
+    base_seed: int = None
 ) -> Dict[str, Any]:
     """
     Run Simulated Annealing multiple times and collect statistics.
@@ -148,11 +154,15 @@ def run_sa(
         max_iterations: Maximum iterations per run
         initial_temp: Initial temperature
         step_size: Step size for neighbor generation
-        base_seed: Base seed for reproducibility
+        base_seed: Base seed for reproducibility (uses global BASE_SEED if None)
         
     Returns:
         Dictionary with statistics and convergence data
     """
+    # Use global BASE_SEED if not provided
+    if base_seed is None:
+        base_seed = BASE_SEED
+    
     config = SAConfig(
         n_dimensions=n_dimensions,
         max_iterations=max_iterations,

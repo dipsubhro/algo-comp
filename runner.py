@@ -62,7 +62,7 @@ except ImportError:
 # ==============================================================================
 NUM_RUNS = 30
 NUM_DIMENSIONS = 5
-BASE_SEED = 12345
+# Note: Each algorithm has its own BASE_SEED in its respective folder
 
 # Algorithm-specific configurations (defaults)
 PSO_CONFIG = {
@@ -208,8 +208,8 @@ def run_pso_experiment(args):
         n_runs=NUM_RUNS,
         n_particles=config['n_particles'],
         n_dimensions=dims,
-        max_iterations=config['max_iterations'],
-        base_seed=BASE_SEED
+        max_iterations=config['max_iterations']
+        # Uses PSO's own BASE_SEED from pso_algorithm.py
     )
     elapsed = time.time() - start
     logger.info(f"[PSO] {name} completed in {elapsed:.2f}s | Best: {result['best_f']:.4e}")
@@ -231,8 +231,8 @@ def run_sa_experiment(args):
         n_dimensions=dims,
         max_iterations=config['max_iterations'],
         initial_temp=config['initial_temp'],
-        step_size=config['step_size'],
-        base_seed=BASE_SEED
+        step_size=config['step_size']
+        # Uses SA's own BASE_SEED from sa_algorithm.py
     )
     elapsed = time.time() - start
     logger.info(f"[SA] {name} completed in {elapsed:.2f}s | Best: {result['best_f']:.4e}")
@@ -278,7 +278,7 @@ def run_ga_experiment(args):
             fn, bounds,
             n_runs=NUM_RUNS,
             n_dimensions=dims,
-            base_seed=BASE_SEED,
+            # Uses GA's own BASE_SEED from ga_algorithm.py
             pop_size=config['pop_size'],
             num_generations=config['num_generations'],
             crossover_rate=config['crossover_rate'],
@@ -298,14 +298,17 @@ def run_ga_experiment(args):
 # ==============================================================================
 
 def run_all_algorithms():
-    """Run all algorithms on all benchmark functions."""
+    """Run all algorithms on all benchmark functions.
+    
+    Algorithm order: PSO, GA, Tabu, SA
+    """
     max_workers = max(1, os.cpu_count() - 2)
     total_start = time.time()
     
     logger.info("=" * 60)
     logger.info("UNIFIED ALGORITHM COMPARISON")
     logger.info("=" * 60)
-    logger.info(f"Algorithms: PSO, SA, Tabu Search" + (", GA" if GA_AVAILABLE else ""))
+    logger.info(f"Algorithms: PSO" + (", GA" if GA_AVAILABLE else "") + ", Tabu Search, SA")
     logger.info(f"Functions: {len(BENCHMARK_FUNCTIONS)}")
     logger.info(f"Runs per function: {NUM_RUNS}")
     logger.info(f"Dimensions: {NUM_DIMENSIONS}")
@@ -323,25 +326,7 @@ def run_all_algorithms():
     all_results["PSO"] = {name: result for algo, name, result in pso_results}
     logger.info(f"✓ PSO completed in {time.time() - pso_start:.2f}s")
     
-    # Run SA
-    logger.info("")
-    logger.info("▶ Starting SA experiments...")
-    sa_start = time.time()
-    with ProcessPoolExecutor(max_workers=max_workers) as executor:
-        sa_results = list(executor.map(run_sa_experiment, BENCHMARK_FUNCTIONS))
-    all_results["SA"] = {name: result for algo, name, result in sa_results}
-    logger.info(f"✓ SA completed in {time.time() - sa_start:.2f}s")
-    
-    # Run Tabu Search
-    logger.info("")
-    logger.info("▶ Starting Tabu Search experiments...")
-    tabu_start = time.time()
-    with ProcessPoolExecutor(max_workers=max_workers) as executor:
-        tabu_results = list(executor.map(run_tabu_experiment, BENCHMARK_FUNCTIONS))
-    all_results["Tabu"] = {name: result for algo, name, result in tabu_results}
-    logger.info(f"✓ Tabu Search completed in {time.time() - tabu_start:.2f}s")
-    
-    # Optionally run GA
+    # Run GA (before Tabu)
     if GA_AVAILABLE:
         logger.info("")
         logger.info("▶ Starting GA experiments...")
@@ -353,6 +338,24 @@ def run_all_algorithms():
             all_results["GA"] = {name: result for algo, name, result in ga_results_filtered}
         logger.info(f"✓ GA completed in {time.time() - ga_start:.2f}s")
     
+    # Run Tabu Search
+    logger.info("")
+    logger.info("▶ Starting Tabu Search experiments...")
+    tabu_start = time.time()
+    with ProcessPoolExecutor(max_workers=max_workers) as executor:
+        tabu_results = list(executor.map(run_tabu_experiment, BENCHMARK_FUNCTIONS))
+    all_results["Tabu"] = {name: result for algo, name, result in tabu_results}
+    logger.info(f"✓ Tabu Search completed in {time.time() - tabu_start:.2f}s")
+    
+    # Run SA (last)
+    logger.info("")
+    logger.info("▶ Starting SA experiments...")
+    sa_start = time.time()
+    with ProcessPoolExecutor(max_workers=max_workers) as executor:
+        sa_results = list(executor.map(run_sa_experiment, BENCHMARK_FUNCTIONS))
+    all_results["SA"] = {name: result for algo, name, result in sa_results}
+    logger.info(f"✓ SA completed in {time.time() - sa_start:.2f}s")
+    
     total_elapsed = time.time() - total_start
     logger.info("")
     logger.info(f"🏁 All algorithms completed in {total_elapsed:.2f}s ({total_elapsed/60:.1f} min)")
@@ -361,39 +364,55 @@ def run_all_algorithms():
 
 
 def generate_comparison_table(all_results):
-    """Generate a unified comparison table."""
-    algorithms = list(all_results.keys())
+    """Generate a unified comparison table matching the preview format.
+    
+    Format: Function | Algorithm | Best | Average | Std Dev | Rank
+    Algorithm order: PSO, GA, Tabu, SA
+    """
+    # Define the algorithm order as specified
+    algorithm_order = ["PSO", "GA", "Tabu", "SA"]
+    # Filter to only include algorithms that are in the results
+    algorithms = [algo for algo in algorithm_order if algo in all_results]
+    
     func_names = [f[0] for f in BENCHMARK_FUNCTIONS]
     
-    # Table 1: Best values per function per algorithm
     table_rows = []
-    headers = ["Function"] + [f"{algo} Best" for algo in algorithms]
+    headers = ["Function", "Algorithm", "Best", "Average", "Std Dev", "Rank"]
     
     for func_name in func_names:
-        row = [func_name]
+        # Calculate ranks for this function based on best values
+        algo_best_values = []
         for algo in algorithms:
             if func_name in all_results[algo]:
                 best_f = all_results[algo][func_name]['best_f']
-                row.append(f"{best_f:.4e}")
-            else:
-                row.append("N/A")
-        table_rows.append(row)
-    
-    # Add ranking row
-    ranking_row = ["RANK (Total Wins)"]
-    for algo in algorithms:
-        wins = 0
-        for func_name in func_names:
-            best_vals = []
-            for a in algorithms:
-                if func_name in all_results[a]:
-                    best_vals.append((a, all_results[a][func_name]['best_f']))
-            if best_vals:
-                winner = min(best_vals, key=lambda x: x[1])[0]
-                if winner == algo:
-                    wins += 1
-        ranking_row.append(str(wins))
-    table_rows.append(ranking_row)
+                algo_best_values.append((algo, best_f))
+        
+        # Sort by best value to determine ranks
+        algo_best_values.sort(key=lambda x: x[1])
+        rank_map = {algo: rank + 1 for rank, (algo, _) in enumerate(algo_best_values)}
+        
+        # Add rows for each algorithm
+        first_algo = True
+        for algo in algorithms:
+            if func_name in all_results[algo]:
+                result = all_results[algo][func_name]
+                best_f = result['best_f']
+                avg_f = result['avg_f']
+                std_f = result['std_f']
+                rank = rank_map.get(algo, "N/A")
+                
+                # Only show function name for the first algorithm row
+                func_display = func_name if first_algo else ""
+                
+                table_rows.append([
+                    func_display,
+                    algo,
+                    f"{best_f:.2e}",
+                    f"{avg_f:.2e}",
+                    f"{std_f:.2e}",
+                    rank
+                ])
+                first_algo = False
     
     return tabulate(table_rows, headers=headers, tablefmt="grid")
 
@@ -469,7 +488,7 @@ def save_results(all_results, output_file="output.txt"):
         f.write("Configuration:\n")
         f.write(f"  Runs per function: {NUM_RUNS}\n")
         f.write(f"  Dimensions: {NUM_DIMENSIONS}\n")
-        f.write(f"  Base seed: {BASE_SEED}\n\n")
+        f.write("  Seeds: Each algorithm uses its own BASE_SEED (see algorithm folders)\n\n")
         
         f.write("=" * 80 + "\n")
         f.write("ALGORITHM COMPARISON (Best Values)\n")

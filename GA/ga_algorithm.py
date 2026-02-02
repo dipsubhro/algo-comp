@@ -8,6 +8,12 @@ import random
 import time
 from multiprocessing import Pool, cpu_count
 
+# ==============================================================================
+# GLOBAL SEED CONFIGURATION
+# Change this value to modify the random seed for GA algorithm
+# ==============================================================================
+BASE_SEED = 54321
+
 # Default configuration (can be overridden)
 DEFAULT_CONFIG = {
     'pop_size': 50,
@@ -129,7 +135,7 @@ def run_ga_single(func, bounds, n_dimensions, seed=42, return_history=False,
     return best_value, best_x
 
 
-def run_ga(func, bounds, n_runs=30, n_dimensions=5, base_seed=12345,
+def run_ga(func, bounds, n_runs=30, n_dimensions=5, base_seed=None,
            pop_size=50, num_generations=1000, crossover_rate=0.9,
            mutation_rate=0.15, elite_size=3):
     """
@@ -140,7 +146,7 @@ def run_ga(func, bounds, n_runs=30, n_dimensions=5, base_seed=12345,
         bounds: Tuple of (min, max) for the search domain
         n_runs: Number of independent runs
         n_dimensions: Number of dimensions
-        base_seed: Base random seed
+        base_seed: Base random seed (uses global BASE_SEED if None)
         pop_size: Population size
         num_generations: Number of generations
         crossover_rate: Crossover probability
@@ -150,6 +156,10 @@ def run_ga(func, bounds, n_runs=30, n_dimensions=5, base_seed=12345,
     Returns:
         dict with keys: best_f, avg_f, median_f, max_f, std_f, best_x, convergence_history
     """
+    # Use global BASE_SEED if not provided
+    if base_seed is None:
+        base_seed = BASE_SEED
+    
     results = []
     best_overall = np.inf
     best_x_overall = None

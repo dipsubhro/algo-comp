@@ -3,20 +3,25 @@
 from tabu import tabu_search
 import numpy as np
 
+# ==============================================================================
+# GLOBAL SEED CONFIGURATION
+# Change this value to modify the random seed for Tabu Search algorithm
+# ==============================================================================
+BASE_SEED = 954777839
+
 
 def run_tabu(fn, num_runs=25, neighbors=10, tenure=5, max_iter=1000, bounds=(-5, 5), dims=5):
     """
     Run tabu search multiple times with deterministic seed policy.
-    Random initial seed, then doubles after each run.
+    Uses global BASE_SEED as the initial seed, then increments for each run.
     """
     best_f = float('inf')
     best_x = None
     all_f = []
     all_histories = []  # Track convergence history from all runs
     
-    # Generate random initial seed within valid 32-bit range
-    initial_seed = np.random.randint(1, 1001)
-    seed = 954777839  # Valid seed within 32-bit range
+    # Use global BASE_SEED
+    seed = BASE_SEED
     
     for run in range(num_runs):
         # Set seed for reproducibility
