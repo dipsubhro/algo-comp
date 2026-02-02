@@ -60,11 +60,11 @@ except ImportError:
 # ==============================================================================
 # CONFIGURATION
 # ==============================================================================
-NUM_RUNS = 25
+NUM_RUNS = 30
 NUM_DIMENSIONS = 5
 BASE_SEED = 12345
 
-# Algorithm-specific configurations
+# Algorithm-specific configurations (defaults)
 PSO_CONFIG = {
     'n_particles': 40,
     'max_iterations': 1000,
@@ -73,8 +73,10 @@ PSO_CONFIG = {
 SA_CONFIG = {
     'max_iterations': 1500,
     'initial_temp': 1000.0,
+    'step_size': 0.5,
 }
 
+# Default Tabu config (used as fallback)
 TABU_CONFIG = {
     'neighbors': 40,
     'tenure': 8,
@@ -83,6 +85,67 @@ TABU_CONFIG = {
 
 GA_CONFIG = {
     'num_runs': NUM_RUNS,
+}
+
+# ==============================================================================
+# FUNCTION-SPECIFIC ALGORITHM CONFIGURATIONS
+# ==============================================================================
+
+# PSO configurations per function (n_particles, max_iterations)
+PSO_CONFIGS = {
+    "Sphere": {'n_particles': 40, 'max_iterations': 1000},
+    "Sum_of_Squares": {'n_particles': 40, 'max_iterations': 1000},
+    "Sum_of_Diff_Powers": {'n_particles': 30, 'max_iterations': 800},
+    "Step": {'n_particles': 50, 'max_iterations': 1200},
+    "Brown": {'n_particles': 35, 'max_iterations': 1000},
+    "Zakharov": {'n_particles': 40, 'max_iterations': 1000},
+    "Dixon_Price": {'n_particles': 45, 'max_iterations': 1200},
+    "Schumer_Steiglitz": {'n_particles': 40, 'max_iterations': 1000},
+    "Csendes": {'n_particles': 30, 'max_iterations': 800},
+    "Sixth_Power": {'n_particles': 30, 'max_iterations': 800},
+    "Powell": {'n_particles': 50, 'max_iterations': 1500},
+    "Quartic": {'n_particles': 30, 'max_iterations': 800},
+    "Rotated_Hyper_Ellipsoid": {'n_particles': 50, 'max_iterations': 1500},
+    "Discus": {'n_particles': 50, 'max_iterations': 1500},
+    "Exponential": {'n_particles': 30, 'max_iterations': 800},
+}
+
+# SA configurations per function (max_iterations, initial_temp, step_size)
+SA_CONFIGS = {
+    "Sphere": {'max_iterations': 1500, 'initial_temp': 1000.0, 'step_size': 0.5},
+    "Sum_of_Squares": {'max_iterations': 1500, 'initial_temp': 1000.0, 'step_size': 1.0},
+    "Sum_of_Diff_Powers": {'max_iterations': 1200, 'initial_temp': 500.0, 'step_size': 0.1},
+    "Step": {'max_iterations': 2000, 'initial_temp': 1500.0, 'step_size': 5.0},
+    "Brown": {'max_iterations': 1500, 'initial_temp': 800.0, 'step_size': 0.3},
+    "Zakharov": {'max_iterations': 1500, 'initial_temp': 1000.0, 'step_size': 0.8},
+    "Dixon_Price": {'max_iterations': 1500, 'initial_temp': 1000.0, 'step_size': 1.0},
+    "Schumer_Steiglitz": {'max_iterations': 1500, 'initial_temp': 1000.0, 'step_size': 1.0},
+    "Csendes": {'max_iterations': 1200, 'initial_temp': 500.0, 'step_size': 0.1},
+    "Sixth_Power": {'max_iterations': 1200, 'initial_temp': 500.0, 'step_size': 0.1},
+    "Powell": {'max_iterations': 2000, 'initial_temp': 1200.0, 'step_size': 0.5},
+    "Quartic": {'max_iterations': 1200, 'initial_temp': 500.0, 'step_size': 0.1},
+    "Rotated_Hyper_Ellipsoid": {'max_iterations': 2000, 'initial_temp': 1500.0, 'step_size': 3.0},
+    "Discus": {'max_iterations': 2000, 'initial_temp': 1500.0, 'step_size': 5.0},
+    "Exponential": {'max_iterations': 1200, 'initial_temp': 500.0, 'step_size': 0.1},
+}
+
+# Tabu configurations per function (neighbors, tenure, max_iter)
+TABU_CONFIGS = {
+    "Sphere": {'neighbors': 40, 'tenure': 8, 'max_iter': 2000},
+    "Sum_of_Squares": {'neighbors': 40, 'tenure': 8, 'max_iter': 2000},
+    "Sum_of_Diff_Powers": {'neighbors': 30, 'tenure': 5, 'max_iter': 1500},
+    "Step": {'neighbors': 50, 'tenure': 10, 'max_iter': 2500},
+    "Brown": {'neighbors': 35, 'tenure': 7, 'max_iter': 2000},
+    "Zakharov": {'neighbors': 40, 'tenure': 8, 'max_iter': 2000},
+    "Dixon_Price": {'neighbors': 45, 'tenure': 9, 'max_iter': 2000},
+    "Schumer_Steiglitz": {'neighbors': 40, 'tenure': 8, 'max_iter': 2000},
+    "Csendes": {'neighbors': 30, 'tenure': 5, 'max_iter': 1500},
+    "Sixth_Power": {'neighbors': 30, 'tenure': 5, 'max_iter': 1500},
+    "Powell": {'neighbors': 50, 'tenure': 10, 'max_iter': 2500},
+    "Quartic": {'neighbors': 30, 'tenure': 5, 'max_iter': 1500},
+    "Rotated_Hyper_Ellipsoid": {'neighbors': 50, 'tenure': 10, 'max_iter': 2500},
+    "Discus": {'neighbors': 50, 'tenure': 10, 'max_iter': 2500},
+    "Exponential": {'neighbors': 30, 'tenure': 5, 'max_iter': 1500},
 }
 
 # Benchmark functions with their bounds
@@ -104,26 +167,6 @@ BENCHMARK_FUNCTIONS = [
     ("Exponential", exponential, (-1, 1), NUM_DIMENSIONS),
 ]
 
-# Step sizes for SA (tuned per function based on search domain)
-SA_STEP_SIZES = {
-    "Sphere": 0.5,
-    "Sum_of_Squares": 1.0,
-    "Sum_of_Diff_Powers": 0.1,
-    "Step": 5.0,
-    "Brown": 0.3,
-    "Zakharov": 0.8,
-    "Dixon_Price": 1.0,
-    "Schumer_Steiglitz": 1.0,
-    "Csendes": 0.1,
-    "Sixth_Power": 0.1,
-    "Powell": 0.5,
-    "Quartic": 0.1,
-    "Rotated_Hyper_Ellipsoid": 3.0,
-    "Discus": 5.0,
-    "Exponential": 0.1,
-}
-
-
 # ==============================================================================
 # ALGORITHM RUNNERS
 # ==============================================================================
@@ -133,12 +176,16 @@ def run_pso_experiment(args):
     name, fn, bounds, dims = args
     start = time.time()
     logger.info(f"[PSO] Starting {name}...")
+    
+    # Get function-specific config or fall back to default
+    config = PSO_CONFIGS.get(name, PSO_CONFIG)
+    
     result = run_pso(
         fn, bounds,
         n_runs=NUM_RUNS,
-        n_particles=PSO_CONFIG['n_particles'],
+        n_particles=config['n_particles'],
         n_dimensions=dims,
-        max_iterations=PSO_CONFIG['max_iterations'],
+        max_iterations=config['max_iterations'],
         base_seed=BASE_SEED
     )
     elapsed = time.time() - start
@@ -151,14 +198,17 @@ def run_sa_experiment(args):
     name, fn, bounds, dims = args
     start = time.time()
     logger.info(f"[SA] Starting {name}...")
-    step_size = SA_STEP_SIZES.get(name, 0.5)
+    
+    # Get function-specific config or fall back to default
+    config = SA_CONFIGS.get(name, SA_CONFIG)
+    
     result = run_sa(
         fn, bounds,
         n_runs=NUM_RUNS,
         n_dimensions=dims,
-        max_iterations=SA_CONFIG['max_iterations'],
-        initial_temp=SA_CONFIG['initial_temp'],
-        step_size=step_size,
+        max_iterations=config['max_iterations'],
+        initial_temp=config['initial_temp'],
+        step_size=config['step_size'],
         base_seed=BASE_SEED
     )
     elapsed = time.time() - start
@@ -171,12 +221,16 @@ def run_tabu_experiment(args):
     name, fn, bounds, dims = args
     start = time.time()
     logger.info(f"[Tabu] Starting {name}...")
+    
+    # Get function-specific config or fall back to default
+    config = TABU_CONFIGS.get(name, TABU_CONFIG)
+    
     result = run_tabu(
         fn,
         num_runs=NUM_RUNS,
-        neighbors=TABU_CONFIG['neighbors'],
-        tenure=TABU_CONFIG['tenure'],
-        max_iter=TABU_CONFIG['max_iter'],
+        neighbors=config['neighbors'],
+        tenure=config['tenure'],
+        max_iter=config['max_iter'],
         bounds=bounds,
         dims=dims
     )
