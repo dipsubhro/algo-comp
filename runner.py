@@ -48,9 +48,9 @@ from pso_algorithm import run_pso
 from sa_algorithm import run_sa
 from run_tabu import run_tabu
 
-# Try to import GA (may have different structure)
+# Try to import GA
 try:
-    from ga_algorithm import run_ga, run_multiple_experiments as run_ga_multi, calculate_statistics
+    from ga_algorithm import run_ga
     GA_AVAILABLE = True
 except ImportError:
     GA_AVAILABLE = False
@@ -84,7 +84,30 @@ TABU_CONFIG = {
 }
 
 GA_CONFIG = {
-    'num_runs': NUM_RUNS,
+    'pop_size': 50,
+    'num_generations': 1000,
+    'crossover_rate': 0.9,
+    'mutation_rate': 0.15,
+    'elite_size': 3,
+}
+
+# GA configurations per function
+GA_CONFIGS = {
+    "Sphere": {'pop_size': 50, 'num_generations': 1000, 'crossover_rate': 0.9, 'mutation_rate': 0.15, 'elite_size': 3},
+    "Sum_of_Squares": {'pop_size': 50, 'num_generations': 1000, 'crossover_rate': 0.9, 'mutation_rate': 0.15, 'elite_size': 3},
+    "Sum_of_Diff_Powers": {'pop_size': 40, 'num_generations': 800, 'crossover_rate': 0.9, 'mutation_rate': 0.1, 'elite_size': 3},
+    "Step": {'pop_size': 60, 'num_generations': 1200, 'crossover_rate': 0.9, 'mutation_rate': 0.2, 'elite_size': 5},
+    "Brown": {'pop_size': 50, 'num_generations': 1000, 'crossover_rate': 0.9, 'mutation_rate': 0.15, 'elite_size': 3},
+    "Zakharov": {'pop_size': 50, 'num_generations': 1000, 'crossover_rate': 0.9, 'mutation_rate': 0.15, 'elite_size': 3},
+    "Dixon_Price": {'pop_size': 55, 'num_generations': 1200, 'crossover_rate': 0.9, 'mutation_rate': 0.15, 'elite_size': 4},
+    "Schumer_Steiglitz": {'pop_size': 50, 'num_generations': 1000, 'crossover_rate': 0.9, 'mutation_rate': 0.15, 'elite_size': 3},
+    "Csendes": {'pop_size': 40, 'num_generations': 800, 'crossover_rate': 0.9, 'mutation_rate': 0.1, 'elite_size': 3},
+    "Sixth_Power": {'pop_size': 40, 'num_generations': 800, 'crossover_rate': 0.9, 'mutation_rate': 0.1, 'elite_size': 3},
+    "Powell": {'pop_size': 60, 'num_generations': 1500, 'crossover_rate': 0.9, 'mutation_rate': 0.2, 'elite_size': 5},
+    "Quartic": {'pop_size': 40, 'num_generations': 800, 'crossover_rate': 0.9, 'mutation_rate': 0.1, 'elite_size': 3},
+    "Rotated_Hyper_Ellipsoid": {'pop_size': 60, 'num_generations': 1500, 'crossover_rate': 0.9, 'mutation_rate': 0.2, 'elite_size': 5},
+    "Discus": {'pop_size': 60, 'num_generations': 1500, 'crossover_rate': 0.9, 'mutation_rate': 0.2, 'elite_size': 5},
+    "Exponential": {'pop_size': 40, 'num_generations': 800, 'crossover_rate': 0.9, 'mutation_rate': 0.1, 'elite_size': 3},
 }
 
 # ==============================================================================
@@ -243,23 +266,30 @@ def run_ga_experiment(args):
     """Run GA on a single function."""
     if not GA_AVAILABLE:
         return None
-    # GA has its own function mapping, need to use function name
     name, fn, bounds, dims = args
-    # GA uses its internal benchmark_functions dict
+    start = time.time()
+    logger.info(f"[GA] Starting {name}...")
+    
+    # Get function-specific config or fall back to default
+    config = GA_CONFIGS.get(name, GA_CONFIG)
+    
     try:
-        results, history = run_ga_multi(name, GA_CONFIG['num_runs'])
-        stats = calculate_statistics(results)
-        return ("GA", name, {
-            'best_f': stats['min'],
-            'avg_f': stats['mean'],
-            'median_f': stats['median'],
-            'max_f': stats['max'],
-            'std_f': stats['std'],
-            'convergence_history': history if history else [],
-            'best_x': None  # GA doesn't return this in the same way
-        })
+        result = run_ga(
+            fn, bounds,
+            n_runs=NUM_RUNS,
+            n_dimensions=dims,
+            base_seed=BASE_SEED,
+            pop_size=config['pop_size'],
+            num_generations=config['num_generations'],
+            crossover_rate=config['crossover_rate'],
+            mutation_rate=config['mutation_rate'],
+            elite_size=config['elite_size']
+        )
+        elapsed = time.time() - start
+        logger.info(f"[GA] {name} completed in {elapsed:.2f}s | Best: {result['best_f']:.4e}")
+        return ("GA", name, result)
     except Exception as e:
-        print(f"GA failed for {name}: {e}")
+        logger.error(f"[GA] {name} failed: {e}")
         return None
 
 
@@ -316,13 +346,11 @@ def run_all_algorithms():
         logger.info("")
         logger.info("▶ Starting GA experiments...")
         ga_start = time.time()
-        ga_results_raw = []
-        for func_data in BENCHMARK_FUNCTIONS:
-            result = run_ga_experiment(func_data)
-            if result:
-                ga_results_raw.append(result)
-        if ga_results_raw:
-            all_results["GA"] = {name: result for algo, name, result in ga_results_raw}
+        with ProcessPoolExecutor(max_workers=max_workers) as executor:
+            ga_results_raw = list(executor.map(run_ga_experiment, BENCHMARK_FUNCTIONS))
+        ga_results_filtered = [r for r in ga_results_raw if r is not None]
+        if ga_results_filtered:
+            all_results["GA"] = {name: result for algo, name, result in ga_results_filtered}
         logger.info(f"✓ GA completed in {time.time() - ga_start:.2f}s")
     
     total_elapsed = time.time() - total_start
