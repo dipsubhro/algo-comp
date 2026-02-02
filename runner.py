@@ -11,11 +11,22 @@ Usage: uv run runner.py
 
 import sys
 import os
+import time
+import logging
+from datetime import datetime
 from pathlib import Path
-from concurrent.futures import ProcessPoolExecutor
+from concurrent.futures import ProcessPoolExecutor, as_completed
 from tabulate import tabulate
 import numpy as np
 import matplotlib.pyplot as plt
+
+# Configure logging
+logging.basicConfig(
+    level=logging.INFO,
+    format='%(asctime)s | %(levelname)-7s | %(message)s',
+    datefmt='%H:%M:%S'
+)
+logger = logging.getLogger(__name__)
 
 # Add algorithm directories to path
 ROOT = Path(__file__).parent
@@ -120,6 +131,8 @@ SA_STEP_SIZES = {
 def run_pso_experiment(args):
     """Run PSO on a single function."""
     name, fn, bounds, dims = args
+    start = time.time()
+    logger.info(f"[PSO] Starting {name}...")
     result = run_pso(
         fn, bounds,
         n_runs=NUM_RUNS,
@@ -128,12 +141,16 @@ def run_pso_experiment(args):
         max_iterations=PSO_CONFIG['max_iterations'],
         base_seed=BASE_SEED
     )
+    elapsed = time.time() - start
+    logger.info(f"[PSO] {name} completed in {elapsed:.2f}s | Best: {result['best_f']:.4e}")
     return ("PSO", name, result)
 
 
 def run_sa_experiment(args):
     """Run SA on a single function."""
     name, fn, bounds, dims = args
+    start = time.time()
+    logger.info(f"[SA] Starting {name}...")
     step_size = SA_STEP_SIZES.get(name, 0.5)
     result = run_sa(
         fn, bounds,
@@ -144,12 +161,16 @@ def run_sa_experiment(args):
         step_size=step_size,
         base_seed=BASE_SEED
     )
+    elapsed = time.time() - start
+    logger.info(f"[SA] {name} completed in {elapsed:.2f}s | Best: {result['best_f']:.4e}")
     return ("SA", name, result)
 
 
 def run_tabu_experiment(args):
     """Run Tabu Search on a single function."""
     name, fn, bounds, dims = args
+    start = time.time()
+    logger.info(f"[Tabu] Starting {name}...")
     result = run_tabu(
         fn,
         num_runs=NUM_RUNS,
@@ -159,6 +180,8 @@ def run_tabu_experiment(args):
         bounds=bounds,
         dims=dims
     )
+    elapsed = time.time() - start
+    logger.info(f"[Tabu] {name} completed in {elapsed:.2f}s | Best: {result['best_f']:.4e}")
     return ("Tabu", name, result)
 
 
@@ -193,44 +216,52 @@ def run_ga_experiment(args):
 def run_all_algorithms():
     """Run all algorithms on all benchmark functions."""
     max_workers = max(1, os.cpu_count() - 2)
+    total_start = time.time()
     
-    print("=" * 80)
-    print("UNIFIED ALGORITHM COMPARISON")
-    print("=" * 80)
-    print(f"Algorithms: PSO, SA, Tabu Search" + (", GA" if GA_AVAILABLE else ""))
-    print(f"Functions: {len(BENCHMARK_FUNCTIONS)}")
-    print(f"Runs per function: {NUM_RUNS}")
-    print(f"Dimensions: {NUM_DIMENSIONS}")
-    print(f"Workers: {max_workers}")
-    print("=" * 80)
-    print()
+    logger.info("=" * 60)
+    logger.info("UNIFIED ALGORITHM COMPARISON")
+    logger.info("=" * 60)
+    logger.info(f"Algorithms: PSO, SA, Tabu Search" + (", GA" if GA_AVAILABLE else ""))
+    logger.info(f"Functions: {len(BENCHMARK_FUNCTIONS)}")
+    logger.info(f"Runs per function: {NUM_RUNS}")
+    logger.info(f"Dimensions: {NUM_DIMENSIONS}")
+    logger.info(f"Workers: {max_workers}")
+    logger.info("=" * 60)
     
     all_results = {}  # {algo: {func_name: result}}
     
     # Run PSO
-    print("Running PSO...")
+    logger.info("")
+    logger.info("▶ Starting PSO experiments...")
+    pso_start = time.time()
     with ProcessPoolExecutor(max_workers=max_workers) as executor:
         pso_results = list(executor.map(run_pso_experiment, BENCHMARK_FUNCTIONS))
     all_results["PSO"] = {name: result for algo, name, result in pso_results}
-    print("  PSO completed ✓")
+    logger.info(f"✓ PSO completed in {time.time() - pso_start:.2f}s")
     
     # Run SA
-    print("Running SA...")
+    logger.info("")
+    logger.info("▶ Starting SA experiments...")
+    sa_start = time.time()
     with ProcessPoolExecutor(max_workers=max_workers) as executor:
         sa_results = list(executor.map(run_sa_experiment, BENCHMARK_FUNCTIONS))
     all_results["SA"] = {name: result for algo, name, result in sa_results}
-    print("  SA completed ✓")
+    logger.info(f"✓ SA completed in {time.time() - sa_start:.2f}s")
     
     # Run Tabu Search
-    print("Running Tabu Search...")
+    logger.info("")
+    logger.info("▶ Starting Tabu Search experiments...")
+    tabu_start = time.time()
     with ProcessPoolExecutor(max_workers=max_workers) as executor:
         tabu_results = list(executor.map(run_tabu_experiment, BENCHMARK_FUNCTIONS))
     all_results["Tabu"] = {name: result for algo, name, result in tabu_results}
-    print("  Tabu Search completed ✓")
+    logger.info(f"✓ Tabu Search completed in {time.time() - tabu_start:.2f}s")
     
     # Optionally run GA
     if GA_AVAILABLE:
-        print("Running GA...")
+        logger.info("")
+        logger.info("▶ Starting GA experiments...")
+        ga_start = time.time()
         ga_results_raw = []
         for func_data in BENCHMARK_FUNCTIONS:
             result = run_ga_experiment(func_data)
@@ -238,7 +269,11 @@ def run_all_algorithms():
                 ga_results_raw.append(result)
         if ga_results_raw:
             all_results["GA"] = {name: result for algo, name, result in ga_results_raw}
-        print("  GA completed ✓")
+        logger.info(f"✓ GA completed in {time.time() - ga_start:.2f}s")
+    
+    total_elapsed = time.time() - total_start
+    logger.info("")
+    logger.info(f"🏁 All algorithms completed in {total_elapsed:.2f}s ({total_elapsed/60:.1f} min)")
     
     return all_results
 

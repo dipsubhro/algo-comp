@@ -1,0 +1,46 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+*.egg-info/
+.eggs/
+dist/
+build/
+
+# Virtual environments
+.venv/
+venv/
+ENV/
+env/
+
+# uv
+.python-version
+uv.lock
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# Output files
+output.txt
+*.png
+*.jpeg
+*.jpg
+
+# Nested git repositories (keep local but don't track)
+GA/.git
+PSO/.git
+SA/.git
+TA/.git
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log

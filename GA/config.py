@@ -1,0 +1,22 @@
+"""
+Simple Configuration
+"""
+
+# GA Parameters - Simple but effective
+NUM_DIMENSIONS = 5
+POP_SIZE = 50
+NUM_GENERATIONS = 1000
+CROSSOVER_RATE = 0.9
+MUTATION_RATE = 0.15
+ELITE_SIZE = 3
+
+# Runs
+NUM_RUNS = 30
+COMBINED_RUNS = 30
+MAX_EXECUTION_TIME = 30  # 30 seconds max
+
+# Display
+TABLE_FORMAT = 'grid'
+DECIMAL_PLACES = 8
+FIGURE_SIZE = (16, 12)
+DPI = 100
