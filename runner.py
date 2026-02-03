@@ -209,23 +209,73 @@ def generate_detailed_tables(all_results):
 
 def generate_convergence_plots(all_results, output_dir='.'):
     algorithms = list(all_results.keys())
-    fig, axes = plt.subplots(2, 2, figsize=(16, 12))
+    # Ensure preferred order
+    preferred = ['PSO', 'GA', 'Tabu', 'SA']
+    sorted_algos = [a for a in preferred if a in algorithms]
+    for a in algorithms:
+        if a not in sorted_algos:
+            sorted_algos.append(a)
+    
+    # Premium Dark Style
+    plt.style.use('dark_background')
+    
+    # Colors for functions (cycling)
+    # simple rainbow or coolwarm
+    cm = plt.get_cmap('tab20')
+    
+    fig, axes = plt.subplots(2, 2, figsize=(20, 16))
     axes = axes.flatten()
-    for idx, algo in enumerate(algorithms[:4]):
+    
+    for idx, algo in enumerate(sorted_algos[:4]):
         ax = axes[idx]
-        for func_name, result in all_results[algo].items():
-            if 'convergence_history' in result and result['convergence_history']:
-                ax.semilogy(result['convergence_history'], label=func_name, linewidth=1)
-        ax.set_title(f'{algo} Convergence Curves (D={NUM_DIMENSIONS})')
-        ax.set_xlabel('Iteration')
-        ax.set_ylabel('Best Cost (Log Scale)')
-        ax.legend(bbox_to_anchor=(1.02, 1), loc='upper left', fontsize=7)
-        ax.grid(True, which='both', ls='-', alpha=0.5)
-    for idx in range(len(algorithms), 4):
+        results = all_results[algo]
+        
+        # Sort functions by name
+        func_names = sorted(results.keys())
+        
+        for i, func_name in enumerate(func_names):
+            res = results[func_name]
+            if 'convergence_history' in res and res['convergence_history']:
+                hist = res['convergence_history']
+                color = cm(i % 20)
+                ax.semilogy(hist, label=func_name, linewidth=1.5, alpha=0.9, color=color)
+                
+        ax.set_title(f'{algo} Convergence Metrics', fontsize=18, fontweight='bold', color='white', pad=15)
+        ax.set_xlabel('Iterations', fontsize=12, color='#cccccc')
+        ax.set_ylabel('Best Cost (Log Scale)', fontsize=12, color='#cccccc')
+        
+        # Grid and Spines
+        ax.grid(True, which='both', linestyle='--', alpha=0.15, color='white')
+        ax.spines['top'].set_visible(False)
+        ax.spines['right'].set_visible(False)
+        ax.spines['bottom'].set_color('#444')
+        ax.spines['left'].set_color('#444')
+        ax.tick_params(colors='#aaaaaa')
+        
+        # Legend outside
+        if idx == 1: # Only one legend to avoid clutter? Or per plot. 
+            # Per plot is better if curves differ, but might crowds.
+            # Let's put legend in the first plot or outside.
+            # actually separate legends are better.
+            pass
+
+        # Legend with smaller font, semi-transparent
+        leg = ax.legend(bbox_to_anchor=(1.0, 1.0), loc='upper left', fontsize=8, framealpha=0.2)
+        for text in leg.get_texts():
+            text.set_color('white')
+
+    # Background color
+    fig.patch.set_facecolor('#121212')
+    for ax in axes:
+        ax.set_facecolor('#121212')
+
+    # Hide unused
+    for idx in range(len(sorted_algos), 4):
         axes[idx].set_visible(False)
+
     plt.tight_layout()
-    output_file = Path(output_dir) / 'convergence_comparison.png'
-    plt.savefig(output_file, dpi=150, bbox_inches='tight')
+    output_file = Path(output_dir) / 'preview.jpeg'
+    plt.savefig(output_file, dpi=300, facecolor='#121212', bbox_inches='tight')
     plt.close()
     print(f'Convergence plots saved to {output_file}')
 
