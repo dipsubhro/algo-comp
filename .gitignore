@@ -27,9 +27,6 @@ uv.lock
 *~
 
 # Output files
-*.png
-*.jpeg
-*.jpg
 
 # Nested git repositories (keep local but don't track)
 GA/.git
