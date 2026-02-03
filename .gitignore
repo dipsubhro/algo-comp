@@ -27,7 +27,6 @@ uv.lock
 *~
 
 # Output files
-output.txt
 *.png
 *.jpeg
 *.jpg
